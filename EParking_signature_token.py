@@ -50,18 +50,10 @@ signature = m.hexdigest()
 
 # Request parameters for CreateTable--passed in a JSON block.
 request_parameters =  {'client_id': client_id, 'ts' : str(ts), 'signature' : signature}
-#
 endpoint = endpoint_base+endpoint_get
-#print('Request URL = ' + endpoint)
-#print('Request parameters is: ' + str(request_parameters))
-#print(request_parameters["signature"])
-
 
 r = requests.post(endpoint, data=request_parameters)
 
-#print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
-#print('Response code: %d\n' % r.status_code)
-#print(r.text)
 
 data = json.loads(r.text)
 #print "json data is: " + str(data)
@@ -74,40 +66,15 @@ def getToken():
             code = content["code"]
             app_id= content["app_id"]
             scope = content["scope"]
-
             #print "return code and app_id are: " + str(code)+ "," + str(app_id)
             # Request parameters for access token retrieving in a JSON block.
             request_parameters = {'client_id': client_id, 'scope': str(scope), 'code': str(code), 'app_id': str(app_id)}
             endpoint = endpoint_base + endpoint_token
             r = requests.post(endpoint, data=request_parameters)
-            #print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
-            #print('Response code: %d\n' % r.status_code)
-            #print(request_parameters)
-            #print(r.text)
             try:
                 return {"content": r.text, "ts": str(ts)}
             except ValueError:
                 print('Error: In return access_token process error')
-    #Here is the new code
-            # datat = json.loads(r.text)
-            # access_token = datat["content"]["access_token"]
-            # endpoint = endpoint_url
-            # method = 'et_common.station.lists'
-            # biz_content = {'appid': str(client_id)}
-            # request_parameters = {'app_id': str(client_id), 'method': method, 'format': 'json', 'charset': 'utf-8', 'timestamp': str(ts), 'token': str(access_token), 'biz_content': json.dumps((biz_content))}
-            # #request_parameters = json.dumps(request_parameters)
-            # r = requests.post(endpoint, data=request_parameters)
-            # print('\nRESPONSE++++++++++++++++++++++++++++++++++++\n')
-            # print('request param:\n')
-            # print(request_parameters)
-            # print('\nresponse param:\n')
-            # print(r.content)
-            # datatt = json.loads(r.content)
-            # print(datatt["content"]["lists"])
-            # print(r.json())
-            # print(r.url)
-
-
         else:
             print "error here."
     else:
