@@ -31,8 +31,6 @@ def EP_API_Base(method=None,biz_content=None,url=endpoint_url,timestamp=str(ts),
 	r = requests.post(url, data=request_parameters)
 	return {"status_code": 0, "return_message": "success", "content": r.json()}
 	
-	
-
 # get StationList
 def EP_getStationList():
 	method = 'et_common.station.lists'
@@ -199,8 +197,8 @@ def EP_getInviteCarList(station_id):
 		return falseMessage
 
 # get Car Image for arrived id and department id
-def EP_getCarImage(station_id,id = '12',type = 'in'):
-	method = 'et_common.input.images'
+def EP_getCarImage(station_id,id = '1',type = 'in'):
+	method = 'et_common.inout.images'
 	biz_content = {"appid": client_id,"station_id": station_id,'type': type ,"id": id}
 	dataContent =  EP_API_Base(method,biz_content)
 	print dataContent["content"]["message"].encode('utf-8')
