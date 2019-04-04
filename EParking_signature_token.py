@@ -5,77 +5,84 @@
 # from EP cloud server
 
 # Author: Wilson Wang (2019, 3, 25)
-# Mender: Jimmy Li (2019, 3, 28)
+
+# Mender: Jimmy Li (2019, 4, 3)
+
 # Imported headers for libraries
-import json
+
+
 import requests
-import time, datetime, hashlib
+import time, hashlib
 import urllib
+# a private module
+import constant
 
 # ************* REQUEST VALUES *************
-method = 'POST'
 
-client_id ='4QFsuiiL3kIVc2OH'
+clientId = constant.getConstant()['clientId']
 
-secret = 'hWSWLQ3Fwv1T19pac8z7RxzZxbiAffNrbGBn'
+clientSecret = constant.getConstant()['clientSecret']
 
-endpoint_base = 'https://oauth.eptingche.cn'
-# get code
-endpoint_get='/silent/auth/get_code'
-# use code to get access_token
-endpoint_token='/silent/auth/access_token'
+baseUrl = constant.getConstant()['baseUrl']
 
-endpoint_url = 'https://api.eptingche.cn/v2/gateway'
+urlGetCode = constant.getConstant()['urlGetCode']
+
+urlGetToken = constant.getConstant()['urlGetToken']
+
 # the content is JSON.
-content_type = 'application/x-www-form-urlencoded'
 
 # First step is to get code for access token retrieving
-if type(client_id) != str:
-    client_id = str(client_id)
 
-dt = datetime.datetime.now()
-ts = int(time.mktime(dt.timetuple()))
-# ts = '1553505653'
-#print "Current timestamp is: " + str(ts)
+# get timestamp
+timeStamp = str(int(time.time()))
 
-signStr="client_id="+client_id+"&"+"ts="+str(ts)+"&"+"secret="+secret
-signStr_encode=signStr.replace("=", "%3D").replace("&", "%26").strip()
-#print "The signStr is: "+ str(signStr)
-#print "The encoded signStr is: " + str(signStr_encode)
+# urlencode
+signStr = "client_id=" + clientId + "&ts=" + timeStamp + "&secret=" + clientSecret
+signStrEncode = urllib.quote(signStr)
 
-m = hashlib.md5(str(signStr_encode))
-signature = m.hexdigest()
+# get signature use md5
+signature = hashlib.md5()
+signature.update(signStrEncode)
+signature = signature.hexdigest()
 
-#print "The signature is: " + signature
+
 
 # Request parameters for CreateTable--passed in a JSON block.
-request_parameters =  {'client_id': client_id, 'ts' : str(ts), 'signature' : signature}
-endpoint = endpoint_base+endpoint_get
+requestParameters =  {'client_id': clientId, 'ts' : timeStamp, 'signature' : signature}
 
-r = requests.post(endpoint, data=request_parameters)
+endPoint = baseUrl + urlGetCode
 
+r = requests.post(endPoint, data=requestParameters)
 
-data = json.loads(r.text)
-#print "json data is: " + str(data)
+data = r.json()
+
 # The Second step is to get access token
 def getToken():
-    if "content" in data:
-        content=data["content"]
-        #print "return content is: " + str(content)
-        if "code" in content and "app_id" in content and "scope" in content:
-            code = content["code"]
-            app_id= content["app_id"]
-            scope = content["scope"]
-            #print "return code and app_id are: " + str(code)+ "," + str(app_id)
-            # Request parameters for access token retrieving in a JSON block.
-            request_parameters = {'client_id': client_id, 'scope': str(scope), 'code': str(code), 'app_id': str(app_id)}
-            endpoint = endpoint_base + endpoint_token
-            r = requests.post(endpoint, data=request_parameters)
-            try:
-                return {"content": r.text, "ts": str(ts)}
-            except ValueError:
-                print('Error: In return access_token process error')
+    if "code" in data.keys():
+        if data["code"] == 0:
+            content = data["content"]
+            #print "return content is: " + str(content)
+            if "code" in content and "app_id" in content and "scope" in content:
+                code = (content["code"])
+                app_id= content["app_id"]
+                scope = content["scope"]
+                #print "return code and app_id are: " + str(code)+ "," + str(app_id)
+                # Request parameters for access token retrieving in a JSON block.
+                requestParameters = {'client_id': clientId, 'scope': scope, 'code': code, 'app_id': app_id}
+                endPoint = baseUrl + urlGetToken
+                r = requests.post(endPoint, data=requestParameters)
+                try:
+                    return r.json()
+                except ValueError:
+                    print('Error: In return access_token process error')
+            else:
+                print "error here."
         else:
-            print "error here."
+            print ""
     else:
         print "error here."
+    print '__name__'
+
+
+if __name__ == '__main__':
+    print getToken()

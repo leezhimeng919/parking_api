@@ -1,8 +1,10 @@
+#_*_ coding:utf-8_*_ 
+#没错，这是中文注释
+#就像这样随便写
 from EParking_signature_token import getToken,endpoint_url,client_id
 import json
 import requests
-import time, datetime, hashlib
-import urllib
+
 
 ts = getToken()["ts"]
 stationId = []
@@ -10,7 +12,7 @@ plate = []
 # hash:use plate to find stationId 
 plate_stationId = {}
 code_askopen = {}
-datat = json.loads(getToken()["content"])
+datat = (getToken()["content"])
 
 access_token = datat["content"]["access_token"]
 
@@ -215,71 +217,72 @@ def EP_adminOpenGate(device_id,cmd = 'open'):
 # gateContent = EP_API_Base('et_common.device.lists',{'appid': client_id,'station_id': str(2642)})
 # print(len(gateContent["content"]["lists"]))
 
-print("getStationList Return JSON Format Data:\n")
-print EP_getStationList()
+if __name__ == '__main__':
+	print("getStationList Return JSON Format Data:\n")
+	print EP_getStationList()
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("the list for stationId:\n")
-print(stationId)
+	print("the list for stationId:\n")
+	print(stationId)
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("getAllGateList no Return:\n")
-EP_getGateList()
+	print("getAllGateList no Return:\n")
+	EP_getGateList()
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("getAllContractList no Return:\n")
-EP_getContractList()
+	print("getAllContractList no Return:\n")
+	EP_getContractList()
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("the list for plate:\n")
-print(plate)
+	print("the list for plate:\n")
+	print(plate)
 
-# print('\n+++++++++++++++\n')
+	# print('\n+++++++++++++++\n')
 
-#print(plate[0].encode('utf-8'))
+	#print(plate[0].encode('utf-8'))
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("the dict for plate : stationId:\n")
-print(plate_stationId)
+	print("the dict for plate : stationId:\n")
+	print(plate_stationId)
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("askGateOpen:\n")
-EP_askGateOpen(plate[7])
+	print("askGateOpen:\n")
+	EP_askGateOpen(plate[7])
 
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("setGateOpen:\n")
-EP_setGateOpen(plate[7])
+	print("setGateOpen:\n")
+	EP_setGateOpen(plate[7])
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("getInviteCarList:\n")
-print EP_getInviteCarList('2642')
+	print("getInviteCarList:\n")
+	print EP_getInviteCarList('2642')
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("setInviteCar:\n")
-EP_setInviteCar(plate[7],'1',"2019-04-02 14:00:00","2019-04-20 14:00:00")
+	print("setInviteCar:\n")
+	EP_setInviteCar(plate[7],'1',"2019-04-02 14:00:00","2019-04-20 14:00:00")
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("delInviteCar\n")
-EP_delInviteCar('2642','127')
+	print("delInviteCar\n")
+	EP_delInviteCar('2642','127')
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("getCarImage:\n")
+	print("getCarImage:\n")
 
-EP_getCarImage('2642','1','in')
+	EP_getCarImage('2642','1','in')
 
-print('\n+++++++++++++++\n')
+	print('\n+++++++++++++++\n')
 
-print("adminOpenGate:\n")
-EP_adminOpenGate('3157','open')
+	print("adminOpenGate:\n")
+	EP_adminOpenGate('3157','open')
