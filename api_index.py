@@ -1,75 +1,93 @@
 #_*_ coding:utf-8_*_ 
 #没错，这是中文注释
 #就像这样随便写
-from EParking_signature_token import getToken,endpoint_url,client_id
-import json
-import requests
+from getSignToken import getToken
+import constant,statusCode
+import requests, time, json
 
 
-ts = getToken()["ts"]
 stationId = []
+
 plate = []
 # hash:use plate to find stationId 
 plate_stationId = {}
+
 code_askopen = {}
-datat = (getToken()["content"])
 
-access_token = datat["content"]["access_token"]
+publicUrl = constant.getConstant()['publicUrl']
 
-falseMessage = {"code": 10001, "message": "False", "content": ""}
-successMessage = {"code": 0, "message": "success", "content": ""}
-#
+clientId = constant.getConstant()['clientId']
+
+timeStamp = str(int(time.time()))
+
+accessToken = str(getToken())
+
 
 # this is common api
-def EP_API_Base(method=None,biz_content=None,url=endpoint_url,timestamp=str(ts),token=str(access_token),api_id = client_id ,format="json",charset="utf-8"):
-	if type(method) != str:
-		return "method format error"
-	if type(biz_content) != dict:
-		return "biz_content format error"
-	if url == None or timestamp == None or token == None or api_id == None:
-		return "Parameters are missing"
-	request_parameters = {'app_id': api_id, 'method': method, 'format': format, 'charset': charset, 'timestamp': timestamp, 'token': token, 'biz_content': json.dumps((biz_content))}
+def EP_API_Base(
+	method = None, 
+	bizContent = None, 
+	url = publicUrl, 
+	timestamp = timeStamp, 
+	token = accessToken, 
+	apiId = clientId, 
+	format = "json", 
+	charset = "utf-8" 
+	):
+	if method == None or bizContent == None:
+		return statusCode.checkCode('F','method or bizContent is None ')
+	if type(bizContent) != dict:
+		return statusCode.checkCode('F','bizeContent is not dict ')
+	requestParameters = {
+	'app_id': apiId, 
+	'method': str(method), 
+	'format': format, 
+	'charset': charset, 
+	'timestamp': timestamp, 
+	'token': token, 
+	'biz_content': json.dumps(bizContent)
+	}
 
-	r = requests.post(url, data=request_parameters)
-	return {"status_code": 0, "return_message": "success", "content": r.json()}
+	r = requests.post(url, data=requestParameters)
+	return statusCode.checkCode('T',r.json())
 	
 # get StationList
 def EP_getStationList():
 	method = 'et_common.station.lists'
-	biz_content = {'appid': client_id}
-	dataContent = EP_API_Base(method,biz_content)
-	if type(dataContent) != dict and dataContent["status_code"] !=0:
-		return falseMessage
+	bizContent = {'appid': clientId}
+	dataContent = EP_API_Base(method,bizContent)
+	if type(dataContent) != dict and dataContent["statusCode"] != 0:
+		return statusCode.checkCode('F')
 	else:
-		dataLists = (dataContent["content"]["content"]["lists"])
+		dataLists = (dataContent["statusContent"]["content"]["lists"])
 		# get station id
 		for i in dataLists:
 			if "station_id" in i.keys():
 				global stationId	
 				stationId.append(str(i["station_id"]))
 			else:
-				return falseMessage
+				return statusCode.checkCode('F')
 		return dataContent
 
 # get GateList by station_id
 def EP_getOneGateList(station_id):
 	method = 'et_common.device.lists'
 	if stationId == []:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if station_id in stationId:
-		biz_content = {'appid': client_id,'station_id': station_id}
-		dataContent = EP_API_Base(method,biz_content)
-		if type(dataContent) != dict and dataContent["status_code"] != 0:
-			return falseMessage
+		bizContent = {'appid': clientId,'station_id': station_id}
+		dataContent = EP_API_Base(method,bizContent)
+		if type(dataContent) != dict and dataContent["statusCode"] != 0:
+			return statusCode.checkCode('F')
 		else:
 			return dataContent
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # get all GateList
 def EP_getGateList():
 	if stationId == []:
-		return falseMessage
+		return statusCode.checkCode('F')
 	else:
 		for i in stationId:
 			EP_getOneGateList(i)
@@ -78,14 +96,14 @@ def EP_getGateList():
 def EP_getOneContractList(station_id):
 	method = 'et_common.contract.lists'
 	if stationId == []:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if station_id in stationId:
-		biz_content = {'appid': client_id,'station_id': station_id}
-		dataContent = EP_API_Base(method,biz_content)
-		if type(dataContent) != dict and dataContent["status_code"] != 0:
-			return falseMessage
+		bizContent = {'appid': clientId,'station_id': station_id}
+		dataContent = EP_API_Base(method,bizContent)
+		if type(dataContent) != dict and dataContent["statusCode"] != 0:
+			return statusCode.checkCode('F')
 		else:
-			dataLists = dataContent["content"]["content"]["lists"]
+			dataLists = dataContent["statusContent"]["content"]["lists"]
 			for i in dataLists:
 				if "plate" in i.keys():
 					global plate	
@@ -93,15 +111,15 @@ def EP_getOneContractList(station_id):
 					global plate_stationId
 					plate_stationId[i["plate"]] = str(i["station_id"])
 				else:
-					return falseMessage
+					return statusCode.checkCode('F')
 			return dataContent
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # get all ContractList
 def EP_getContractList():
 	if stationId == []:
-		return falseMessage
+		return statusCode.checkCode('F')
 	else:
 		for i in stationId:
 			EP_getOneContractList(i)
@@ -111,13 +129,13 @@ def EP_getContractList():
 def EP_delOneContractPlate(plate_num):
 	method = 'et_common.contract.del'
 	if plate == [] or plate_stationId == {}:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if plate_num in plate:
-		biz_content = {"appid": client_id,"station_id": plate_stationId[plate_num], "plate": plate_num}
-		EP_API_Base(method,biz_content)
-		return successMessage
+		bizContent = {"appid": clientId,"station_id": plate_stationId[plate_num], "plate": plate_num}
+		EP_API_Base(method,bizContent)
+		return statusCode.checkCode('T')
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # if necessary
 # del all ContractPlate
@@ -127,94 +145,94 @@ def EP_delOneContractPlate(plate_num):
 def EP_recoverOneContractPlate(plate_num):
 	method = 'et_common.contract.recover'
 	if plate == [] or plate_stationId == {}:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if plate_num in plate:
-		biz_content = {"appid": client_id,"station_id": plate_stationId[plate_num], "plate": plate_num}
-		EP_API_Base(method,biz_content)
-		return successMessage
+		bizContent = {"appid": clientId,"station_id": plate_stationId[plate_num], "plate": plate_num}
+		EP_API_Base(method,bizContent)
+		return statusCode.checkCode('T')
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # ask GateOpen
 def EP_askGateOpen(plate_num):
 	method = 'et_common.car.askopen'
 	if plate == [] or plate_stationId == {}:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if plate_num in plate:
-		biz_content = {"appid": client_id,"station_id": plate_stationId[plate_num], "plate": plate_num}
-		dataContent =  EP_API_Base(method,biz_content)
-		if type(dataContent["content"]["content"]) == list:
-			dataLists = dataContent["content"]["content"]
+		bizContent = {"appid": clientId,"station_id": plate_stationId[plate_num], "plate": plate_num}
+		dataContent =  EP_API_Base(method,bizContent)
+		if type(dataContent["statusContent"]["content"]) == list:
+			dataLists = dataContent["statusContent"]["content"]
 			global code_askopen
 			code_askopen[plate_stationId[plate_num]] = dataLists[0]["code"]
 		else:
 			code_askopen[plate_stationId[plate_num]] = "12345"
-			print(dataContent["content"]["message"].encode('utf-8'))
+			print(dataContent["statusContent"]["message"].encode('utf-8'))
 		return dataContent
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # set GateOpen
 def EP_setGateOpen(plate_num):
 	method = 'et_common.car.open'
 	if plate == [] or plate_stationId == {} or code_askopen == {}:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if plate_num in plate:
-		biz_content = {"appid": client_id,"station_id": plate_stationId[plate_num], "plate": plate_num, "code": code_askopen[plate_stationId[plate_num]]}
-		dataContent =  EP_API_Base(method,biz_content)
-		print(dataContent["content"]["message"].encode('utf-8'))
+		bizContent = {"appid": clientId,"station_id": plate_stationId[plate_num], "plate": plate_num, "code": code_askopen[plate_stationId[plate_num]]}
+		dataContent =  EP_API_Base(method,bizContent)
+		print(dataContent["statusContent"]["message"].encode('utf-8'))
 		return dataContent
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # set InviteCar
 def EP_setInviteCar(plate_num,clientId,starttime="2019-04-02 14:00:00",stoptime="2019-04-20 14:00:00"):
 	method = 'et_common.authorize.bespeak'
-	biz_content = {"appid": client_id,"station_id": plate_stationId[plate_num], "plate": plate_num, "starttime": starttime, "stoptime": stoptime, "client_id": clientId}
-	dataContent =  EP_API_Base(method,biz_content)
-	print dataContent["content"]["message"].encode('utf-8')
+	bizContent = {"appid": clientId,"station_id": plate_stationId[plate_num], "plate": plate_num, "starttime": starttime, "stoptime": stoptime, "clientId": clientId}
+	dataContent =  EP_API_Base(method,bizContent)
+	print dataContent["statusContent"]["message"].encode('utf-8')
 	return dataContent
 
 # del InviteCar
 def EP_delInviteCar(station_id,authorize_id = '1'):
 	method = 'et_common.authorize.del'
-	biz_content = {"appid": client_id,"station_id": station_id,"authorize_id": authorize_id}
-	dataContent =  EP_API_Base(method,biz_content)
-	print dataContent["content"]["message"].encode('utf-8')
+	bizContent = {"appid": clientId,"station_id": station_id,"authorize_id": authorize_id}
+	dataContent =  EP_API_Base(method,bizContent)
+	print dataContent["statusContent"]["message"].encode('utf-8')
 	return dataContent
 
 # get the list for Invite Car 
 def EP_getInviteCarList(station_id):
 	method = 'et_common.authorize.lists'
 	if stationId == []:
-		return falseMessage
+		return statusCode.checkCode('F')
 	if station_id in stationId:
-		biz_content = {'appid': client_id,'station_id': station_id}
-		dataContent = EP_API_Base(method,biz_content)
-		if type(dataContent) != dict and dataContent["status_code"] != 0:
-			return falseMessage
+		bizContent = {'appid': clientId,'station_id': station_id}
+		dataContent = EP_API_Base(method,bizContent)
+		if type(dataContent) != dict and dataContent["statusCode"] != 0:
+			return statusCode.checkCode('F')
 		else:
 			return dataContent
 	else:
-		return falseMessage
+		return statusCode.checkCode('F')
 
 # get Car Image for arrived id and department id
 def EP_getCarImage(station_id,id = '1',type = 'in'):
 	method = 'et_common.inout.images'
-	biz_content = {"appid": client_id,"station_id": station_id,'type': type ,"id": id}
-	dataContent =  EP_API_Base(method,biz_content)
-	print dataContent["content"]["message"].encode('utf-8')
+	bizContent = {"appid": clientId,"station_id": station_id,'type': type ,"id": id}
+	dataContent =  EP_API_Base(method,bizContent)
+	print dataContent["statusContent"]["message"].encode('utf-8')
 	return dataContent
 
 # get the admin_auth to Open Gate
 def EP_adminOpenGate(device_id,cmd = 'open'):
 	method = 'et_common.device.openAndClose'
-	biz_content = {"appid": client_id,"cmd": cmd ,"device_id": device_id}
-	dataContent =  EP_API_Base(method,biz_content)
-	print dataContent["content"]["message"].encode('utf-8')
+	bizContent = {"appid": clientId,"cmd": cmd ,"device_id": device_id}
+	dataContent =  EP_API_Base(method,bizContent)
+	print dataContent["statusContent"]["message"].encode('utf-8')
 	return dataContent
 
-# gateContent = EP_API_Base('et_common.device.lists',{'appid': client_id,'station_id': str(2642)})
+# gateContent = EP_API_Base('et_common.device.lists',{'appid': clientId,'station_id': str(2642)})
 # print(len(gateContent["content"]["lists"]))
 
 if __name__ == '__main__':
