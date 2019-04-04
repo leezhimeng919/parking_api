@@ -1,22 +1,21 @@
 __all__ = ['checkCode']
 
 statusTable = {
-	0 : '成功'
-	10001 : '参数缺失说明'
+	'T' : 0,
+	'F' : 1
 }
 
 
 
 
-def checkCode(request):
-	if type(request) != dict:
-		return 'fasle'
-	if "code" in request.keys():
-		code = request["code"]
-		return status[code]
-
-
+def checkCode(bool):
+	if type(bool) == str:
+		if statusTable[bool]:
+			return {'statusCode' : statusTable[bool], 'statusMessage' : 'error'}
+		return {'statusCode' : statusTable[bool], 'statusMessage' : 'success'}
+	else:
+		raise ValueError,'you should input type str : "T" or "F"'
 		
 
 if __name__ == '__main__':
-	checkCode({1:2})
+	print checkCode(1)

@@ -1,5 +1,5 @@
 
-__all__ = ['getConstant','a']
+__all__ = ['getConstant']
 
 def getConstant():
 	constants = {
@@ -20,7 +20,6 @@ def getConstant():
 
 	return constants
  
-a={1:2}
 
 
 if __name__ == '__main__':

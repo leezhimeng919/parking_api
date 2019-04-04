@@ -56,14 +56,16 @@ r = requests.post(endPoint, data=requestParameters)
 
 data = r.json()
 
+print data
 # The Second step is to get access token
 def getToken():
+    if "code" not in data.keys():
+        return 
     if "code" in data.keys():
         if data["code"] == 0:
             content = data["content"]
-            #print "return content is: " + str(content)
             if "code" in content and "app_id" in content and "scope" in content:
-                code = (content["code"])
+                code = content["code"]
                 app_id= content["app_id"]
                 scope = content["scope"]
                 #print "return code and app_id are: " + str(code)+ "," + str(app_id)
