@@ -217,7 +217,7 @@
     + 使用方法
     `from getSignToken import getToken`
 
-- apiIndex.py
+- EP_coreAPILib.py
     + 说明：主接口通道，目前开放13个接口
     + 开放函数： 无
 
