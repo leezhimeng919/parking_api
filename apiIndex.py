@@ -1,6 +1,14 @@
 #_*_ coding:utf-8_*_ 
-#没错，这是中文注释
-#就像这样随便写
+# Copyright 2016-2019 Smart Gateway Pte. Ltd. All Rights Reserved.
+#
+# EP parking signature and token retrieving
+# This file is given as an example to calculate the signature and retrieve access token
+# from EP cloud server
+
+# Author: Jimmy Li (2019, 4, 4)
+# Mender: Jimmy Li (2019, 4, 5)
+#	      Jimmy Li (2019, 4, 8)
+
 from getSignToken import getToken
 import constant,statusCode
 import requests, time, json
