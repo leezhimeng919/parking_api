@@ -35,6 +35,8 @@ def EP_API_Base(methodArg, bizContentArg):
 	'timestamp': timeStamp, 'token': accessToken, 
 	'biz_content': json.dumps(bizContentArg) }
 	r = requests.post(publicUrl, data=requestParameters)
+	if r.json()['code'] != 0:
+		return statusCode.checkCode('F',r.json()['message'].encode('utf-8'))
 	return statusCode.checkCode('T',r.json())
 	
 # get StationList
@@ -46,7 +48,7 @@ def EP_getStationList(pageArg = '1', pagesizeArg = '20'):
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # get GateList by station_id
 def EP_getGateList(stationIdArg, directionArg = 'in'):
@@ -59,7 +61,7 @@ def EP_getGateList(stationIdArg, directionArg = 'in'):
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 
 
@@ -76,7 +78,7 @@ def EP_getContractList(
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['message'].encode('utf-8'))
 	
 
 
@@ -89,7 +91,7 @@ def EP_delContractPlate(stationIdArg, plateArg):
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['message'].encode('utf-8'))
 	
 
 # recover ContractPlate by plate
@@ -101,7 +103,7 @@ def EP_recoverContractPlate(stationIdArg, plateArg):
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 
 # ask GateOpen
@@ -115,18 +117,18 @@ def EP_askGateOpen(stationIdArg, plateArg, typeArg = 'in'):
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # set GateOpen
 def EP_setGateOpen(stationIdArg, plateArg, code):
 	method = 'et_common.car.open'
 	bizContent = {
 	"appid": clientId, "station_id": stationIdArg, 
-	"plate": plate_num, "code": code }
+	"plate": plateArg, "code": code }
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 
 # set InviteCar
@@ -138,11 +140,11 @@ def EP_setInviteCar(
 	bizContent = {
 	"appid": clientId, "station_id": stationIdArg, 
 	"plate": plateArg, "starttime": starttimeArg , 
-	"stoptime": stoptimeArg, "clientId": clientIdArg }
+	"stoptime": stoptimeArg, "client_id": clientIdArg }
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # del InviteCar
 def EP_delInviteCar(stationIdArg, authorizeIdArg):
@@ -151,7 +153,7 @@ def EP_delInviteCar(stationIdArg, authorizeIdArg):
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # get the list for Invite Car 
 def EP_getInviteCarList(
@@ -166,7 +168,7 @@ def EP_getInviteCarList(
 	dataContent = EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # get Car Image for arrived id and department id
 def EP_getCarImage(stationIdArg, typeArg, idArg, 
@@ -182,7 +184,7 @@ def EP_getCarImage(stationIdArg, typeArg, idArg,
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # get the admin_auth to Open Gate
 def EP_adminOpenGate(deviceIdArg, cmdArg):
@@ -193,47 +195,37 @@ def EP_adminOpenGate(deviceIdArg, cmdArg):
 	dataContent =  EP_API_Base(method,bizContent)
 	if dataContent["statusCode"] == 0:
 		return statusCode.checkCode('T',dataContent)
-	return statusCode.checkCode('F','parameter error')
+	return statusCode.checkCode('F',dataContent['statusContent'])
 
 # gateContent = EP_API_Base('et_common.device.lists',{'appid': clientId,'station_id': str(2642)})
 # print(len(gateContent["content"]["lists"]))
 
 if __name__ == '__main__':
 
-	print("getStationList Return JSON Format Data:\n")
+	print("getStationList:\n")
 	print EP_getStationList()
 	print('\n+++++++++++++++\n')
 
 
-	print("getAllGateList no Return:\n")
-	EP_getGateList()
+	print("getGateList:\n")
+	print EP_getGateList('2642')
 
 	print('\n+++++++++++++++\n')
 
-	print("getAllContractList no Return:\n")
-	EP_getContractList()
+	print("getContractList:\n")
+	print EP_getContractList('2642')
 
-	print('\n+++++++++++++++\n')
-
-	# print('\n+++++++++++++++\n')
-
-	#print(plate[0].encode('utf-8'))
-
-	print('\n+++++++++++++++\n')
-
-	print("the dict for plate : stationId:\n")
-	print(plate_stationId)
 
 	print('\n+++++++++++++++\n')
 
 	print("askGateOpen:\n")
-	EP_askGateOpen('粤V12345')
+	print EP_askGateOpen('2642','粤V12345')['statusContent']
 
 
 	print('\n+++++++++++++++\n')
 
 	print("setGateOpen:\n")
-	EP_setGateOpen('粤V12345')
+	print EP_setGateOpen('2642','粤V12345','12345')['statusContent']
 
 	print('\n+++++++++++++++\n')
 
@@ -243,20 +235,20 @@ if __name__ == '__main__':
 	print('\n+++++++++++++++\n')
 
 	print("setInviteCar:\n")
-	EP_setInviteCar('粤V12345','1',"2019-04-02 14:00:00","2019-04-20 14:00:00")
+	print EP_setInviteCar('2642',"2019-04-11 14:00:00","2019-04-16 14:00:00",'1','粤V12347')['statusContent']
 
 	print('\n+++++++++++++++\n')
 
 	print("delInviteCar\n")
-	EP_delInviteCar('2642','127')
+	print EP_delInviteCar('2642','133')['statusContent']
 
 	print('\n+++++++++++++++\n')
 
 	print("getCarImage:\n")
 
-	EP_getCarImage('2642','1','in')
+	print EP_getCarImage('2642','in','1')['statusContent']
 
 	print('\n+++++++++++++++\n')
 
 	print("adminOpenGate:\n")
-	EP_adminOpenGate('3157','open')
+	print EP_adminOpenGate('3157','open')['statusContent']

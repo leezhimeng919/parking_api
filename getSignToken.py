@@ -55,7 +55,6 @@ r = requests.post(endPoint, data=requestParameters)
 
 data = r.json()
 
-print data
 # The Second step is to get access token
 def getToken():
     if "content" not in data.keys():
