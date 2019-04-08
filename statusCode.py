@@ -6,7 +6,7 @@
 
 # Author: Jimmy Li (2019, 4, 4)
 
-__all__ = ['checkCode']
+__all__ = ['checkBaseCode' , 'checkSubCode']
 
 
 statusTable = {
@@ -15,14 +15,24 @@ statusTable = {
 }
 
 
-def checkCode(bool,content = ""):
+def checkBaseCode(bool,content = ""):
 	if type(bool) == str:
 		if statusTable[bool]:
-			return {'statusCode' : statusTable[bool], 'statusMessage' : 'error', 'statusContent' : content }
-		return {'statusCode' : statusTable[bool], 'statusMessage' : 'success', 'statusContent' : content }
+			if type(content) == dict:
+				content = {'errorBaseCode': content['code'] , 'errorBaseMessage':content['message'] }
+			return {'statusBaseCode' : statusTable[bool], 'statusBaseMessage' : 'error', 'statusBaseContent' : content }
+		return {'statusBaseCode' : statusTable[bool], 'statusBaseMessage' : 'success', 'statusBaseContent' : content }
 	else:
 		raise ValueError,'you should input type str : "T" or "F"'
 		
+def checkSubCode(bool,content = ""):
+	if type(bool) == str:
+		if statusTable[bool]:
+			return {'statusSubCode' : statusTable[bool], 'statusSubMessage' : 'error', 'statusSubContent' : content }
+		return {'statusSubCode' : statusTable[bool], 'statusSubMessage' : 'success', 'statusSubContent' : content }
+	else:
+		raise ValueError,'you should input type str : "T" or "F"'
+
 
 if __name__ == '__main__':
-	print checkCode('T')
+	print checkSubCode('F', {'code':9000 , 'message': 'asdas', 'casd': 'dasdsa'})

@@ -1,17 +1,50 @@
 # 返回值说明
 - 通用接口返回值
 成功
-: `{'statusCode':'0', 'statusMessage':'success', 'statusContent':'接收的数据'}`
+: 
+    { 
+        'statusBaseCode':'0', 
+        'statusBaseMessage':'success', 
+        'statusBaseContent':'接收的数据'
+    }
 失败
-: `{'statusCode':'1', 'statusMessage':'error', 'statusContent':'接收的数据'}`
+:
+  
+    {
+        'statusBaseCode' : 1, 
+        'statusBaseMessage' : 'error', 
+        'statusBaseContent': 
+            {
+                'errorBaseCode': content['code'] ,
+                'errorBaseMessage':content['message'] 
+            }
 
-- 其他接口返回值
+    }
+
+
+
+
+- 其他子接口返回值
 成功
-: `{'statusCode':'0', 'statusMessage':'success', 'statusContent'{'statusCode':'0', 'statusMessage':'success', 'statusContent':'接收的数据'}`
-、`{'statusCode':'0', 'statusMessage':'success', 'statusContent'{'statusCode':'1', 'statusMessage':'error', 'statusContent':'接收的数据'}`
+:
+     {
+        'statusSubCode': '0',
+        'statusSubMessage': 'success', 
+        'statusSubContent': '接收的数据'
+    }
+
 失败
-: `{'statusCode':'1', 'statusMessage':'error', 'statusContent'{'statusCode':'0', 'statusMessage':'success', 'statusContent':'接收的数据'}`
-、`{'statusCode':'1', 'statusMessage':'error', 'statusContent'{'statusCode':'1', 'statusMessage':'error', 'statusContent':'接收的数据'}`
+: 
+    {
+        'statusSubCode':'1', 
+        'statusSubMessage':'error', 
+        'statusSubContent':
+            {
+                'errorBaseCode': content['code'] , 
+                'errorBaseMessage':content['message'] 
+            }
+    }
+
 
 # 接口说明
 
@@ -34,8 +67,6 @@
         * 第二个参数 pagesizeArg
             - 类型 str
             - 默认值 '20'
-
-
 
    
 - 道闸信息查询 EP_getGateList(stationIdArg [,directionArg = 'in'])
@@ -176,9 +207,9 @@
 
 - statusCode.py
     + 说明：接口开发测试所用的添加状态头的模块
-    + 开放函数：checkCode
+    + 开放函数：checkBaseCode、checkSubCode
     + 使用方式：
-    `from statusCode import checkCode`
+    `from statusCode import checkCode checkSubCode`
 
 - getSignToken.py
     + 说明：获取access_token的模块
