@@ -80,8 +80,6 @@ def EP_getGateList(stationIdArg, directionArg = 'in'):
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
 
-
-
 # get ContractList by station_id
 def EP_getContractList(
 	stationIdArg, plateArg = '#', 
@@ -91,7 +89,7 @@ def EP_getContractList(
 		'appid': clientId, 'station_id': stationIdArg, 
 		'page': pageArg, 'pagesize': pagesizeArg }
 	if plateArg != '#':
-		bizContent['palte'] = plateArg
+		bizContent['plate'] = plateArg
 	data = EP_API_Base(method,bizContent)
 	dataContent = data['statusBaseContent']
 	if data["statusBaseCode"] == 0:
@@ -112,7 +110,6 @@ def EP_delContractPlate(stationIdArg, plateArg):
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
 	
-
 # recover ContractPlate by plate
 def EP_recoverContractPlate(stationIdArg, plateArg):
 	method = 'et_common.contract.recover'
@@ -124,7 +121,6 @@ def EP_recoverContractPlate(stationIdArg, plateArg):
 	if data["statusBaseCode"] == 0:
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
-
 
 # ask GateOpen
 def EP_askGateOpen(stationIdArg, plateArg, typeArg = 'in'):
@@ -152,7 +148,6 @@ def EP_setGateOpen(stationIdArg, plateArg, code):
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
 
-
 # set InviteCar
 def EP_setInviteCar(
 	stationIdArg, starttimeArg, 
@@ -178,6 +173,7 @@ def EP_delInviteCar(stationIdArg, authorizeIdArg):
 	if data["statusBaseCode"] == 0:
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
+
 # get the list for Invite Car 
 def EP_getInviteCarList(
 	stationIdArg, plateArg = '#', 
@@ -187,7 +183,7 @@ def EP_getInviteCarList(
 		'appid': clientId, 'station_id': stationIdArg, 
 		'page': pageArg, 'pagesize': pagesizeArg }
 	if plateArg != '#':
-		bizContent['palte'] = plateArg
+		bizContent['plate'] = plateArg
 	data = EP_API_Base(method,bizContent)
 	dataContent = data['statusBaseContent']
 	if data["statusBaseCode"] == 0:
@@ -235,8 +231,9 @@ def selfPrint():
 	print EP_getGateList('2642')
 	print('\n+++++++++++++++\n')
 	print("getContractList:\n")
-	print EP_getContractList('2642')
+	print EP_getContractList('2642','粤B10007')
 	print('\n+++++++++++++++\n')
+	# print EP_delContractPlate('2642', '粤B9999X')['statusSubContent']
 	print("askGateOpen:\n")
 	print EP_askGateOpen('2642','粤V12345')
 	print('\n+++++++++++++++\n')
@@ -250,7 +247,7 @@ def selfPrint():
 	print EP_setInviteCar('2642',"2019-04-11 14:00:00","2019-04-16 14:00:00",'1','粤V12347')
 	print('\n+++++++++++++++\n')
 	print("delInviteCar\n")
-	print EP_delInviteCar('2642','133')
+	# print EP_delInviteCar('2642','133')['statusSubContent']['errorBaseMessage'].encode('utf-8')
 	print('\n+++++++++++++++\n')
 	print("getCarImage:\n")
 	print EP_getCarImage('2642','in','1')
