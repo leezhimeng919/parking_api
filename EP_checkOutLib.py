@@ -6,16 +6,20 @@
 # from EP cloud server
 
 # Author: Jimmy Li (2019, 4, 8)
+# mender: Jimmy Li (2018, 4, 9)
 # mender: Jimmy Li (2018, 4, 10)
+# mender: Jimmy Li (2018, 4, 11)
 
 import EP_coreAPILib
 import constant,statusCode
 import requests, time, json
 
 
-def checkOutWorkingStatus(stationIdArg, pageArg = '1', pagesizeArg = '20'):
+authorizedIdHash = {}
+
+def checkOutWorkingStatus(stationIdArg):
 	# call EP_coreAPILib.EP_getStationList to get station Info
-	data = EP_coreAPILib.EP_getStationList(pageArg = '1', pagesizeArg = '20')
+	data = EP_coreAPILib.EP_getStationList()
 	if 'content' not in data['statusSubContent']:
 		return False
 	stationLists = data['statusSubContent']['content']['lists']
@@ -29,8 +33,8 @@ def checkOutWorkingStatus(stationIdArg, pageArg = '1', pagesizeArg = '20'):
 		return False
 	return dataContent[stationIdArg]
 
-def getContractPlateList(stationIdArg, pageArg = '1', pagesizeArg = '20' ):
-	data = EP_coreAPILib.EP_getContractList(stationIdArg, pageArg = '1', pagesizeArg = '20')
+def getContractPlateList(stationIdArg):
+	data = EP_coreAPILib.EP_getContractList(stationIdArg)
 	if 'content' not in data['statusSubContent']:
 		return []
 	dataLists = data['statusSubContent']['content']['lists']
@@ -52,16 +56,64 @@ def delOneContractPlate(stationIdArg, plateArg):
 	return False
 
 def recoverOneContractPlate(stationIdArg, plateArg):
-	preDelList = getContractPlateList(stationIdArg)
-	if plateArg in preDelList:
+	preRecoverList = getContractPlateList(stationIdArg)
+	if plateArg in preRecoverList:
 		return False
 	EP_coreAPILib.EP_recoverContractPlate(stationIdArg, plateArg)
-	postDelList = getContractPlateList(stationIdArg)
-	print preDelList
-	print postDelList
-	if plateArg in postDelList:
+	postRecoverList = getContractPlateList(stationIdArg)
+
+	if plateArg in postRecoverList:
 		return True
 	return False
 
+def getInviteCarPlateList(stationIdArg):
+	data = EP_coreAPILib.EP_getInviteCarList(stationIdArg)
+	if 'content' not in data['statusSubContent']:
+		return []
+	dataLists = data['statusSubContent']['content']['lists']
+	plateList = []
+	for i in dataLists:
+		if 'plate' not in i.keys() and 'authorize_id' not in i.keys():
+			continue
+		plateList.append(i['plate'].encode('utf-8'))
+	return plateList
 
+def getAuthorizeIdByPlate(stationIdArg,plateArg):
+	data = EP_coreAPILib.EP_getInviteCarList(stationIdArg)
+	if 'content' not in data['statusSubContent']:
+		return None
+	dataLists = data['statusSubContent']['content']['lists']
+	plateAuthHash = {}
+	for i in dataLists:
+		if 'authorize_id' not in i.keys():
+			continue
+		plateAuthHash[i['plate'].encode('utf-8')] = i['authorize_id']
+	plateList = getInviteCarPlateList(stationIdArg)
+	if plateArg in plateList:
+		return plateAuthHash[plateArg]
+	return None
 
+def setInviteCarPlate(
+	stationIdArg, starttimeArg, 
+	stoptimeArg, clientIdArg, plateArg):
+	preSetList = getInviteCarPlateList(stationIdArg)
+	if plateArg in preSetList:
+		return False
+	data = EP_coreAPILib.EP_setInviteCar(stationIdArg, starttimeArg, 
+	stoptimeArg, clientIdArg, plateArg)
+	postSetList = getInviteCarPlateList(stationIdArg)
+	if plateArg in postSetList:
+		return True
+	return False
+
+def delInviteCarPlate(stationIdArg, plateArg):
+	preDelList = getInviteCarPlateList(stationIdArg)
+	if plateArg not in preDelList:
+		return False
+	authorizeIdArg = getAuthorizeIdByPlate(stationIdArg, plateArg)
+	data = EP_coreAPILib.EP_delInviteCar(stationIdArg, authorizeIdArg)
+	# print data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+	postDelList = getInviteCarPlateList(stationIdArg)
+	if plateArg not in postDelList:
+		return True
+	return False

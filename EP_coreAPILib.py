@@ -168,7 +168,7 @@ def EP_setInviteCar(
 def EP_delInviteCar(stationIdArg, authorizeIdArg):
 	method = 'et_common.authorize.del'
 	bizContent = {"appid": clientId,"station_id": stationIdArg,"authorize_id": authorizeIdArg}
-	data = EP_API_Base(method,bizContent)
+	data = EP_API_Base(method, bizContent)
 	dataContent = data['statusBaseContent']
 	if data["statusBaseCode"] == 0:
 		return statusCode.checkSubCode('T',dataContent)
@@ -244,10 +244,10 @@ def selfPrint():
 	print EP_getInviteCarList('2642')
 	print('\n+++++++++++++++\n')
 	print("setInviteCar:\n")
-	print EP_setInviteCar('2642',"2019-04-11 14:00:00","2019-04-16 14:00:00",'1','粤V12347')
+	print EP_setInviteCar('2642',"2019-04-11 14:00:00","2019-04-16 14:00:00",'1','粤V12352')
 	print('\n+++++++++++++++\n')
 	print("delInviteCar\n")
-	# print EP_delInviteCar('2642','133')['statusSubContent']['errorBaseMessage'].encode('utf-8')
+	print EP_delInviteCar(264,141)
 	print('\n+++++++++++++++\n')
 	print("getCarImage:\n")
 	print EP_getCarImage('2642','in','1')
