@@ -220,9 +220,23 @@ def EP_adminOpenGate(deviceIdArg, cmdArg):
 		return statusCode.checkSubCode('T',dataContent)
 	return statusCode.checkSubCode('F',dataContent)
 
-# gateContent = EP_API_Base('et_common.device.lists',{'appid': clientId,'station_id': str(2642)})
-# print(len(gateContent["content"]["lists"]))
+def EP_TBD(departureIdArg, arrivalIdArg, deviceIdArg,
+	timeArg, memberArg, carIdArg, plateArg, eventArg, 
+	stationIdArg, stationNameArg):
+	method = '#'
+	bizContent = {
+	'departure_id': departureIdArg, 'arrival_id':arrivalIdArg,
+	'device_id': deviceIdArg, 'time': timeArg, 'member': memberArg,
+	'car_id': carIdArg, 'plate': plateArg, 'event': eventArg,
+	'station_id': stationIdArg, 'station_name': stationNameArg
+	}
+	data = EP_API_Base(method,bizContent)
+	dataContent = data['statusBaseContent']
+	if data["statusBaseCode"] == 0:
+		return statusCode.checkSubCode('T',dataContent)
+	return statusCode.checkSubCode('F',dataContent)
 
+	
 def selfPrint():
 	print("getStationList:\n")
 	print EP_getStationList()

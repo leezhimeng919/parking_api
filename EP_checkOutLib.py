@@ -9,6 +9,7 @@
 # mender: Jimmy Li (2018, 4, 9)
 # mender: Jimmy Li (2018, 4, 10)
 # mender: Jimmy Li (2018, 4, 11)
+# mender: Jimmy Li (2018, 4, 12)
 
 import EP_coreAPILib
 import constant,statusCode
@@ -117,3 +118,64 @@ def delInviteCarPlate(stationIdArg, plateArg):
 	if plateArg not in postDelList:
 		return True
 	return False
+
+# 目标：紧急道闸开启
+# 实现：通过getGateList接口得到的status信息(Y/N)来
+
+# def setGateOpen(stationIdArg, plateArg):
+# 	dataGate = EP_coreAPILib.EP_getGateList(stationIdArg)
+# 	if 'content' not in dataGate['statusSubContent']:
+# 		return False
+# 	dataLists = dataGate['statusSubContent']['content']['lists']
+# 	gateStatusHash = {}
+# 	for i in dataLists:
+# 		gateStatusHash[i['station_id']] = [i['direction'], i['status']]
+# 	typeArg = gateStatusHash[stationIdArg][0]
+# 	print typeArg
+# 	print gateStatusHash
+# 	data = EP_coreAPILib.EP_askGateOpen(stationIdArg, plateArg, typeArg)
+# 	if 'content' not in data['statusSubContent']:
+# 		# return data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+# 		return False
+# 	gateCode = data['statusSubContent']['content']['code']
+# 	dataContent = EP_coreAPILib.EP_setGateOpen(stationIdArg, plateArg, gateCode)
+# 	if gateStatusHash[stationIdArg][1] != 'Y':
+# 		return False
+# 	return True
+
+def setGateOpen(stationIdArg, plateArg, typeArg = 'in'):
+	data = EP_coreAPILib.EP_askGateOpen(stationIdArg, plateArg, typeArg)
+	if 'content' not in data['statusSubContent']:
+		# return data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+		return False
+	gateCode = data['statusSubContent']['content']['code']
+	dataContent = EP_coreAPILib.EP_setGateOpen(stationIdArg, plateArg, gateCode)
+	if 'errorBaseMessage'  in data['statusSubContent']:
+		return False
+	return True
+
+
+def adminOpenGate(deviceIdArg, cmdArg):
+	data = EP_coreAPILib.EP_adminOpenGate(deviceIdArg, cmdArg)
+	if 'errorBaseMessage' in data['statusSubContent']:
+		# return data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+		return False
+	return True
+
+def TBD(departureIdArg, arrivalIdArg, deviceIdArg,
+	timeArg, memberArg, carIdArg, plateArg, eventArg, 
+	stationIdArg, stationNameArg):
+	data = EP_coreAPILib.EP_TBD(deviceIdArg, cmdArg)
+	if 'errorBaseMessage' in data['statusSubContent']:
+		# return data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+		return False
+	return True
+
+def getCarImage(stationIdArg, typeArg, idArg, 
+	dateArg = str(time.strftime('%Y%m',time.localtime(time.time()))) ):
+	data = EP_coreAPILib.etCarImage(stationIdArg, typeArg, idArg, 
+	dateArg = str(time.strftime('%Y%m',time.localtime(time.time()))) )
+	if 'errorBaseMessage' in data['statusSubContent']:
+		# return data['statusSubContent']['errorBaseMessage'].encode('utf-8')
+		return False
+	return True
