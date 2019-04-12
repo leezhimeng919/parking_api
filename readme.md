@@ -1,14 +1,15 @@
 # 返回值说明
 - 通用接口返回值
 成功
-: 
+```
     { 
         'statusBaseCode':'0', 
         'statusBaseMessage':'success', 
         'statusBaseContent':'接收的数据'
     }
+```
 失败
-:
+```
   
     {
         'statusBaseCode' : 1, 
@@ -20,21 +21,21 @@
             }
 
     }
-
+```
 
 
 
 - 其他子接口返回值
 成功
-:
+```
      {
         'statusSubCode': '0',
         'statusSubMessage': 'success', 
         'statusSubContent': '接收的数据'
     }
-
+```
 失败
-: 
+```
     {
         'statusSubCode':'1', 
         'statusSubMessage':'error', 
@@ -45,7 +46,7 @@
             }
     }
 
-
+```
 # 接口说明
 
 - 通用EP停车场接口调用 EP_API_Base(methodArg, bizContentArg)
