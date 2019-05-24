@@ -1,5 +1,0 @@
-#server
-server.port=8088
-server.max-http-header-size=1000000
-
-
